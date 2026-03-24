@@ -9,8 +9,7 @@ local Games = {
 }
 
 if Games[PlaceId] then
-    warn("Roxy Hub: Loading script for PlaceId: " .. PlaceId)
     loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
 else
-    warn("Roxy Hub: Game not supported.")
+    game.Players.LocalPlayer:Kick("\n\n[Roxy Hub]\nThis game is not supported.\nCheck our Discord for updates!")
 end

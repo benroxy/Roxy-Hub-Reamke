@@ -5,7 +5,8 @@ local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/
 
 local Games = {
     [10449761463] = "RoxyHubRemakeTsb",
-    [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT"
+    [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT",
+    [142823291] = "Roxy%20Hub%20Murder-Mystery-2" -- Murder Mystery 2 Added
 }
 
 if Games[PlaceId] then

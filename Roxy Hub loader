@@ -1,0 +1,16 @@
+-- Roxy Hub | Universal Loader
+
+local PlaceId = game.PlaceId
+local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/heads/main/"
+
+local Games = {
+    [10449761463] = "RoxyHubRemakeTsb",
+    [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT"
+}
+
+if Games[PlaceId] then
+    warn("Roxy Hub: Loading script for PlaceId: " .. PlaceId)
+    loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
+else
+    warn("Roxy Hub: Game not supported.")
+end

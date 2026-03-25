@@ -1,8 +1,44 @@
--- Roxy Hub | Universal Loader
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local KeyInput = Instance.new("TextBox")
+local SubmitBtn = Instance.new("TextButton")
 
+-- GUI Setup
+ScreenGui.Name = "RoxyHubKey"
+ScreenGui.Parent = game.CoreGui
+
+MainFrame.Name = "Main"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.BorderSizePixel = 0
+
+Title.Parent = MainFrame
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "ROXY HUB | KEY"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.TextSize = 18
+
+KeyInput.Parent = MainFrame
+KeyInput.Position = UDim2.new(0.1, 0, 0.4, 0)
+KeyInput.Size = UDim2.new(0.8, 0, 0, 30)
+KeyInput.PlaceholderText = "Enter Key Here..."
+KeyInput.Text = ""
+
+SubmitBtn.Parent = MainFrame
+SubmitBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
+SubmitBtn.Size = UDim2.new(0.8, 0, 0, 30)
+SubmitBtn.Text = "Submit"
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Logic
 local PlaceId = game.PlaceId
 local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/heads/main/"
-local Key = "RoxyTest" -- Your Key
+local CorrectKey = "RoxyTest"
 
 local Games = {
     [10449761463] = "RoxyHubRemakeTsb",
@@ -10,15 +46,16 @@ local Games = {
     [142823291] = "Roxy%20Hub%20Murder-Mystery-2"
 }
 
-if Games[PlaceId] then
-    -- Key Check (Simple)
-    local UserInput = "RoxyTest" -- You can replace this with your GUI input later
-    
-    if UserInput == Key then
-        loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
+SubmitBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == CorrectKey then
+        ScreenGui:Destroy()
+        if Games[PlaceId] then
+            loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
+        else
+            game.Players.LocalPlayer:Kick("\n\n[Roxy Hub]\nGame not supported.")
+        end
     else
-        game.Players.LocalPlayer:Kick("\n\n[Roxy Hub]\nInvalid Key!\nGet key from Discord.")
+        KeyInput.Text = ""
+        KeyInput.PlaceholderText = "WRONG KEY!"
     end
-else
-    game.Players.LocalPlayer:Kick("\n\n[Roxy Hub]\nThis game is not supported.")
-end
+end)

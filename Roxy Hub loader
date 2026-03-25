@@ -1,19 +1,21 @@
+-- Roxy Hub | Loader with Key System GUI
+
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local KeyInput = Instance.new("TextBox")
 local SubmitBtn = Instance.new("TextButton")
 
--- GUI Setup
-ScreenGui.Name = "RoxyHubKey"
+ScreenGui.Name = "RoxyHubKeySystem"
 ScreenGui.Parent = game.CoreGui
 
-MainFrame.Name = "Main"
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
 MainFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
 MainFrame.Size = UDim2.new(0, 200, 0, 150)
-MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
 
 Title.Parent = MainFrame
 Title.Size = UDim2.new(1, 0, 0, 40)
@@ -25,17 +27,19 @@ Title.TextSize = 18
 KeyInput.Parent = MainFrame
 KeyInput.Position = UDim2.new(0.1, 0, 0.4, 0)
 KeyInput.Size = UDim2.new(0.8, 0, 0, 30)
-KeyInput.PlaceholderText = "Enter Key Here..."
+KeyInput.PlaceholderText = "Enter Key..."
 KeyInput.Text = ""
+KeyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 SubmitBtn.Parent = MainFrame
 SubmitBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
 SubmitBtn.Size = UDim2.new(0.8, 0, 0, 30)
-SubmitBtn.Text = "Submit"
-SubmitBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SubmitBtn.Text = "SUBMIT"
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 
--- Logic
+-- System
 local PlaceId = game.PlaceId
 local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/heads/main/"
 local CorrectKey = "RoxyTest"

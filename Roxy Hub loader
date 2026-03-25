@@ -2,15 +2,23 @@
 
 local PlaceId = game.PlaceId
 local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/heads/main/"
+local Key = "RoxyTest" -- Your Key
 
 local Games = {
     [10449761463] = "RoxyHubRemakeTsb",
     [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT",
-    [142823291] = "Roxy%20Hub%20Murder-Mystery-2" -- Murder Mystery 2 Added
+    [142823291] = "Roxy%20Hub%20Murder-Mystery-2"
 }
 
 if Games[PlaceId] then
-    loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
+    -- Key Check (Simple)
+    local UserInput = "RoxyTest" -- You can replace this with your GUI input later
+    
+    if UserInput == Key then
+        loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
+    else
+        game.Players.LocalPlayer:Kick("\n\n[Roxy Hub]\nInvalid Key!\nGet key from Discord.")
+    end
 else
-    game.Players.LocalPlayer:Kick("\n\n[Roxy Hub]\nThis game is not supported.\nCheck our Discord for updates!")
+    game.Players.LocalPlayer:Kick("\n\n[Roxy Hub]\nThis game is not supported.")
 end

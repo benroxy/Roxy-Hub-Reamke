@@ -1,146 +1,99 @@
--- [[ ROXY HUB | ULTIMATE LOADER & KEY SYSTEM ]] --
+-- [[ ROXY HUB | WINDUI & JUNKIE INTEGRATED LOADER ]] --
 
-local Services = {
-    Players = game:GetService("Players"),
-    TweenService = game:GetService("TweenService"),
-    CoreGui = game:GetService("CoreGui")
+-- 1. WindUI ve Junkie SDK Yükleme
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Junkie = loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
+
+-- Junkie Ayarları
+Junkie.service = "RoxyHub"
+Junkie.identifier = "1035974" -- Senin Junkie Panel ID'n
+Junkie.provider = "RoxyHub loader"
+
+-- 2. WindUI İçin Junkie Servisini Tanımlama
+WindUI.Services.junkiedevelopment = {
+    Name = "Junkie Development", 
+    Icon = "shield-check",
+    Args = { "ServiceId", "ApiKey", "Provider" },
+
+    New = function()
+        local function Verify(key)
+            local result = Junkie.check_key(key)
+            if result and result.valid then
+                if result.message == "KEYLESS" then
+                    getgenv().SCRIPT_KEY = "KEYLESS"
+                    return true, "Keyless mode activated"
+                elseif result.message == "KEY_VALID" then
+                    getgenv().SCRIPT_KEY = key
+                    return true, "Key is valid!"
+                else
+                    return false, "Invalid key provided"
+                end
+            end
+            return false, "Verification failed"
+        end
+
+        local function Copy()
+            local link = Junkie.get_key_link()
+            if setclipboard then setclipboard(link) end
+            return link
+        end
+
+        return { Verify = Verify, Copy = Copy }
+    end
 }
 
-local Player = Services.Players.LocalPlayer
+-- 3. WindUI Penceresini Oluşturma (Key System Dahil)
+local Window = WindUI:CreateWindow({
+    Title = "Roxy Hub | Premium Loader",
+    Theme = "Dark",
+    Transparent = true,
+    Resizable = true,
+
+    KeySystem = {
+        Note = "Enter your Roxy Hub key to continue.",
+        SaveKey = true, -- Anahtarı hatırlar, her seferinde sormaz
+        API = {
+            {
+                Title = "Roxy Key System",
+                Desc  = "Click to copy key link (" .. Junkie.service .. ")",
+                Icon  = "key-round",
+                Type  = "junkiedevelopment"
+            }
+        }
+    }
+})
+
+-- 4. Key Doğrulanana Kadar Bekle
+while not getgenv().SCRIPT_KEY do
+    task.wait(0.1)
+end
+
+-- 5. Oyun Kontrolü ve Yükleme Mantığı
 local PlaceId = game.PlaceId
 local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/heads/main/"
-local CorrectKey = "RoxyTest"
-local Website = "https://benroxy.github.io/"
 
--- Oyun Listesi
 local Games = {
-    [10449761463] = "RoxyHubRemakeTsb",
-    [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT",
-    [142823291] = "Roxy%20Hub%20Murder-Mystery-2"
+    [10449761463] = "RoxyHubRemakeTsb", -- The Strongest Battlegrounds
+    [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT", -- Lucky Block
+    [142823291] = "Roxy%20Hub%20Murder-Mystery-2" -- MM2
 }
 
--- UI Kurulumu
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "RoxyEliteKey"
-ScreenGui.Parent = Services.CoreGui
-ScreenGui.ResetOnSpawn = false
-
-local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 350, 0, 420)
-Main.Position = UDim2.new(0.5, -175, 0.5, -210)
-Main.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-Main.BorderSizePixel = 0
-Main.Parent = ScreenGui
-Main.Active = true
-Main.Draggable = true
-
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 16)
-local Stroke = Instance.new("UIStroke", Main)
-Stroke.Color = Color3.fromRGB(180, 100, 255) -- Roxy Moru
-Stroke.Thickness = 2
-Stroke.Transparency = 0.4
-
--- Header
-local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1, 0, 0, 80)
-Title.Text = "ROXY HUB"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 28
-Title.BackgroundTransparency = 1
-
-local Subtitle = Instance.new("TextLabel", Main)
-Subtitle.Size = UDim2.new(1, 0, 0, 20)
-Subtitle.Position = UDim2.new(0, 0, 0, 70)
-Subtitle.Text = "Access Key Required"
-Subtitle.TextColor3 = Color3.fromRGB(150, 150, 160)
-Subtitle.Font = Enum.Font.Gotham
-Subtitle.TextSize = 14
-Subtitle.BackgroundTransparency = 1
-
--- Input Box
-local KeyBox = Instance.new("TextBox", Main)
-KeyBox.Size = UDim2.new(0.8, 0, 0, 45)
-KeyBox.Position = UDim2.new(0.1, 0, 0.35, 0)
-KeyBox.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-KeyBox.PlaceholderText = "Enter Access Key..."
-KeyBox.Text = ""
-KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyBox.Font = Enum.Font.Gotham
-KeyBox.TextSize = 16
-Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0, 10)
-
--- Verify Button
-local VerifyBtn = Instance.new("TextButton", Main)
-VerifyBtn.Size = UDim2.new(0.8, 0, 0, 45)
-VerifyBtn.Position = UDim2.new(0.1, 0, 0.52, 0)
-VerifyBtn.BackgroundColor3 = Color3.fromRGB(180, 100, 255)
-VerifyBtn.Text = "VERIFY"
-VerifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-VerifyBtn.Font = Enum.Font.GothamBold
-VerifyBtn.TextSize = 16
-Instance.new("UICorner", VerifyBtn).CornerRadius = UDim.new(0, 10)
-
--- Buttons Container
-local GetKeyBtn = Instance.new("TextButton", Main)
-GetKeyBtn.Size = UDim2.new(0.38, 0, 0, 35)
-GetKeyBtn.Position = UDim2.new(0.1, 0, 0.68, 0)
-GetKeyBtn.BackgroundColor3 = Color3.fromRGB(40, 140, 100)
-GetKeyBtn.Text = "Get Key"
-GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-GetKeyBtn.Font = Enum.Font.GothamMedium
-GetKeyBtn.TextSize = 14
-Instance.new("UICorner", GetKeyBtn).CornerRadius = UDim.new(0, 8)
-
-local DiscordBtn = Instance.new("TextButton", Main)
-DiscordBtn.Size = UDim2.new(0.38, 0, 0, 35)
-DiscordBtn.Position = UDim2.new(0.52, 0, 0.68, 0)
-DiscordBtn.BackgroundColor3 = Color3.fromRGB(60, 70, 180)
-DiscordBtn.Text = "Discord (Soon)"
-DiscordBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-DiscordBtn.Font = Enum.Font.GothamMedium
-DiscordBtn.TextSize = 12
-Instance.new("UICorner", DiscordBtn).CornerRadius = UDim.new(0, 8)
-
--- Status Text
-local Status = Instance.new("TextLabel", Main)
-Status.Size = UDim2.new(1, 0, 0, 30)
-Status.Position = UDim2.new(0, 0, 0, 330)
-Status.BackgroundTransparency = 1
-Status.Text = ""
-Status.TextSize = 14
-Status.Font = Enum.Font.Gotham
-
--- SYSTEM LOGIC --
-VerifyBtn.MouseButton1Click:Connect(function()
-    if KeyBox.Text == CorrectKey then
-        Status.TextColor3 = Color3.fromRGB(50, 255, 100)
-        Status.Text = "Access Granted! Checking Game..."
-        task.wait(1)
-        
-        if Games[PlaceId] then
-            ScreenGui:Destroy()
-            loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
-        else
-            Status.TextColor3 = Color3.fromRGB(255, 150, 50)
-            Status.Text = "Game not supported by Roxy Hub."
-            task.wait(2)
-            ScreenGui:Destroy()
-        end
-    else
-        Status.TextColor3 = Color3.fromRGB(255, 50, 50)
-        Status.Text = "Invalid Key! Please try again."
-        KeyBox.Text = ""
-    end
-end)
-
-GetKeyBtn.MouseButton1Click:Connect(function()
-    setclipboard(Website)
-    Status.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Status.Text = "Website copied! Check browser."
-end)
-
-DiscordBtn.MouseButton1Click:Connect(function()
-    Status.TextColor3 = Color3.fromRGB(200, 200, 200)
-    Status.Text = "Discord Server coming soon!"
-end)
+-- Key doğrulandıktan sonra oyunu çek
+if Games[PlaceId] then
+    -- Bildirim gönder (WindUI tarzı)
+    WindUI:Notify({
+        Title = "Roxy Hub",
+        Content = "Access Granted! Loading script...",
+        Duration = 3
+    })
+    
+    task.wait(1)
+    loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
+else
+    -- Desteklenmeyen oyun bildirimi
+    WindUI:Notify({
+        Title = "Error",
+        Content = "Game ID (" .. PlaceId .. ") is not supported by Roxy Hub.",
+        Duration = 5
+    })
+end

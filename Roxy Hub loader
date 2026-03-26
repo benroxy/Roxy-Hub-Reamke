@@ -1,61 +1,62 @@
--- [[ ROXY HUB | WINDUI & JUNKIE INTEGRATED LOADER ]] --
+-- [[ ROXY HUB | CLEAN GHOST LOADER ]] --
 
--- 1. WindUI ve Junkie SDK Yükleme
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Junkie = loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
 
--- Junkie Ayarları
+-- Junkie Config
 Junkie.service = "RoxyHub"
-Junkie.identifier = "1035974" -- Senin Junkie Panel ID'n
+Junkie.identifier = "1035974"
 Junkie.provider = "RoxyHub loader"
 
--- 2. WindUI İçin Junkie Servisini Tanımlama
+-- Game Database
+local PlaceId = game.PlaceId
+local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/heads/main/"
+
+local Games = {
+    [10449761463] = "RoxyHubRemakeTsb",
+    [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT",
+    [142823291] = "Roxy%20Hub%20Murder-Mystery-2"
+}
+
+-- Junkie Service Definition
 WindUI.Services.junkiedevelopment = {
     Name = "Junkie Development", 
     Icon = "shield-check",
     Args = { "ServiceId", "ApiKey", "Provider" },
 
     New = function()
-        local function Verify(key)
-            local result = Junkie.check_key(key)
-            if result and result.valid then
-                if result.message == "KEYLESS" then
-                    getgenv().SCRIPT_KEY = "KEYLESS"
-                    return true, "Keyless mode activated"
-                elseif result.message == "KEY_VALID" then
-                    getgenv().SCRIPT_KEY = key
-                    return true, "Key is valid!"
-                else
-                    return false, "Invalid key provided"
+        return {
+            Verify = function(key)
+                local result = Junkie.check_key(key)
+                if result and result.valid then
+                    getgenv().SCRIPT_KEY = (result.message == "KEYLESS") and "KEYLESS" or key
+                    return true, "Success"
                 end
+                return false, "Invalid Key"
+            end,
+            Copy = function()
+                local link = Junkie.get_key_link()
+                if setclipboard then setclipboard(link) end
+                return link
             end
-            return false, "Verification failed"
-        end
-
-        local function Copy()
-            local link = Junkie.get_key_link()
-            if setclipboard then setclipboard(link) end
-            return link
-        end
-
-        return { Verify = Verify, Copy = Copy }
+        }
     end
 }
 
--- 3. WindUI Penceresini Oluşturma (Key System Dahil)
+-- Initialize Loader
 local Window = WindUI:CreateWindow({
-    Title = "Roxy Hub | Premium Loader",
+    Title = "Roxy Hub Premium",
     Theme = "Dark",
     Transparent = true,
     Resizable = true,
 
     KeySystem = {
-        Note = "Enter your Roxy Hub key to continue.",
-        SaveKey = true, -- Anahtarı hatırlar, her seferinde sormaz
+        Note = "Roxy Hub - Access Required",
+        SaveKey = true,
         API = {
             {
-                Title = "Roxy Key System",
-                Desc  = "Click to copy key link (" .. Junkie.service .. ")",
+                Title = "Get Key",
+                Desc  = "Copy link to clipboard",
                 Icon  = "key-round",
                 Type  = "junkiedevelopment"
             }
@@ -63,37 +64,26 @@ local Window = WindUI:CreateWindow({
     }
 })
 
--- 4. Key Doğrulanana Kadar Bekle
-while not getgenv().SCRIPT_KEY do
-    task.wait(0.1)
-end
+-- Silent Mode
+Window:Close()
 
--- 5. Oyun Kontrolü ve Yükleme Mantığı
-local PlaceId = game.PlaceId
-local BaseURL = "https://raw.githubusercontent.com/benroxy/Roxy-Hub-Reamke/refs/heads/main/"
+-- Verification Loop
+repeat task.wait(0.2) until getgenv().SCRIPT_KEY ~= nil
 
-local Games = {
-    [10449761463] = "RoxyHubRemakeTsb", -- The Strongest Battlegrounds
-    [124473577469410] = "Roxy%20Hub%20Be-a-Lucky-Block%20SCR%C4%B0PT", -- Lucky Block
-    [142823291] = "Roxy%20Hub%20Murder-Mystery-2" -- MM2
-}
-
--- Key doğrulandıktan sonra oyunu çek
+-- Script Deployment
 if Games[PlaceId] then
-    -- Bildirim gönder (WindUI tarzı)
     WindUI:Notify({
         Title = "Roxy Hub",
-        Content = "Access Granted! Loading script...",
+        Content = "Authenticated. Loading script...",
         Duration = 3
     })
     
-    task.wait(1)
+    task.wait(0.5)
     loadstring(game:HttpGet(BaseURL .. Games[PlaceId]))()
 else
-    -- Desteklenmeyen oyun bildirimi
     WindUI:Notify({
         Title = "Error",
-        Content = "Game ID (" .. PlaceId .. ") is not supported by Roxy Hub.",
+        Content = "Current game is not supported.",
         Duration = 5
     })
 end
